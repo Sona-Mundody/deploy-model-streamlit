@@ -72,11 +72,25 @@ if source_radio == settings.IMAGE:
 
     with col2:
         if source_img is None:
-            default_detected_image_path = str(settings.DEFAULT_DETECT_IMAGE)
-            default_detected_image = PIL.Image.open(
-                default_detected_image_path)
-            st.image(default_detected_image_path, caption='Detected Image',
-                     use_column_width=True)
+            uploaded_image = PIL.Image.open(settings.DEFAULT_IMAGE)
+            res = model.predict(uploaded_image, conf=confidence )
+            boxes = res[0].boxes
+            res_plotted = res[0].plot()[:, :, ::-1]
+            st.image(res_plotted, caption='Detected Image',  use_column_width=True)
+            try:
+                with st.expander("Detection Results"):
+                    st.write(res[0].speed)
+                    #for box in boxes:
+                        #st.write(box.data)
+            except Exception as ex:
+                    # st.write(ex)
+                st.write("No image is uploaded yet!")
+           # default_detected_image_path = str(settings.DEFAULT_DETECT_IMAGE)
+           # default_detected_image = PIL.Image.open(
+            #    default_detected_image_path)
+            #st.image(default_detected_image_path, caption='Detected Image',
+             #        use_column_width=True)
+             
         else:
             if st.sidebar.button('Detect Objects'):
                 res = model.predict(uploaded_image,
@@ -88,8 +102,9 @@ if source_radio == settings.IMAGE:
                          use_column_width=True)
                 try:
                     with st.expander("Detection Results"):
+                        
                         for box in boxes:
-                            st.write(box.data)
+                           st.write(box.data)
                 except Exception as ex:
                     # st.write(ex)
                     st.write("No image is uploaded yet!")
